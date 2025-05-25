@@ -65,8 +65,7 @@ export default function Home() {
       setError('')
     }
   }
-  
-  // Handler for search button
+    // Handler for search button
   const handleSearch = () => {
     if (!fromStation || !toStation) {
       setError('Please select both departure and arrival stations')
@@ -83,8 +82,8 @@ export default function Home() {
       return
     }
     
-    // Here you would typically navigate to search results or perform an API call
-    alert(`Searching for trains from ${fromStation} to ${toStation} on ${selectedDate}`)
+    // Navigate to route-tickets page
+    window.location.href = '/route-tickets'
     setError('')
   }
   
@@ -95,10 +94,9 @@ export default function Home() {
         <Link href="/" className="flex items-center">
           <div className="text-2xl font-bold mr-2">🚄</div>
           <h1 className="text-2xl font-bold">Railnet</h1>
-        </Link>
-        <div className="hidden sm:flex space-x-6">
+        </Link>        <div className="hidden sm:flex space-x-6">
           <Link href="/schedule" className="hover:underline">Schedule</Link>
-          <Link href="#" className="hover:underline">Route & Tickets</Link>
+          <Link href="/route-tickets" className="hover:underline">Route & Tickets</Link>
           <Link href="#" className="hover:underline">Help</Link>
         </div>
       </div>

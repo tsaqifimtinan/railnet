@@ -318,11 +318,9 @@ export default function SchedulePage() {
         <Link href="/" className="flex items-center">
           <div className="text-2xl font-bold mr-2">🚄</div>
           <h1 className="text-2xl font-bold">Railnet</h1>
-        </Link>
-        <div className="hidden sm:flex space-x-6">
-          <Link href="/" className="hover:underline">Home</Link>
+        </Link>        <div className="hidden sm:flex space-x-6">
           <Link href="/schedule" className="font-bold">Schedule</Link>
-          <Link href="/tickets" className="hover:underline">Tickets</Link>
+          <Link href="/route-tickets" className="hover:underline">Route & Tickets</Link>
           <Link href="#" className="hover:underline">Help</Link>
         </div>
       </div>
