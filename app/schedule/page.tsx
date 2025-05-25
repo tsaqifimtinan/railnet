@@ -321,7 +321,6 @@ export default function SchedulePage() {
         </Link>        <div className="hidden sm:flex space-x-6">
           <Link href="/schedule" className="font-bold">Schedule</Link>
           <Link href="/route-tickets" className="hover:underline">Route & Tickets</Link>
-          <Link href="#" className="hover:underline">Help</Link>
         </div>
       </div>
       

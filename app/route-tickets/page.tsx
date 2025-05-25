@@ -174,7 +174,6 @@ export default function RouteTicketsPage() {
         <div className="hidden sm:flex space-x-6">
           <Link href="/schedule" className="hover:underline">Schedule</Link>
           <Link href="/route-tickets" className="font-bold">Route & Tickets</Link>
-          <Link href="#" className="hover:underline">Help</Link>
         </div>
       </div>
       
