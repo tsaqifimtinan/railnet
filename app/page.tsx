@@ -4,21 +4,34 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
-// Dummy data for MRT Jakarta stations
+// Dummy data for MRT Jakarta stations with line information
 const stations = [
-  { id: 1, name: "Lebak Bulus Grab", city: "Jakarta Selatan" },
-  { id: 2, name: "Fatmawati", city: "Jakarta Selatan" },
-  { id: 3, name: "Cipete Raya", city: "Jakarta Selatan" },
-  { id: 4, name: "Haji Nawi", city: "Jakarta Selatan" },
-  { id: 5, name: "Blok A", city: "Jakarta Selatan" },
-  { id: 6, name: "Blok M BCA", city: "Jakarta Selatan" },
-  { id: 7, name: "ASEAN", city: "Jakarta Selatan" },
-  { id: 8, name: "Senayan", city: "Jakarta Selatan" },
-  { id: 9, name: "Istora Mandiri", city: "Jakarta Pusat" },
-  { id: 10, name: "Bendungan Hilir", city: "Jakarta Pusat" },
-  { id: 11, name: "Setiabudi Astra", city: "Jakarta Pusat" },
-  { id: 12, name: "Dukuh Atas BNI", city: "Jakarta Pusat" },
-  { id: 13, name: "Bundaran HI", city: "Jakarta Pusat" },
+  // Main North-South Line (Blue Line)
+  { id: 1, name: "Lebak Bulus Grab", city: "Jakarta Selatan", line: "blue" },
+  { id: 2, name: "Fatmawati", city: "Jakarta Selatan", line: "blue" },
+  { id: 3, name: "Cipete Raya", city: "Jakarta Selatan", line: "blue" },
+  { id: 4, name: "Haji Nawi", city: "Jakarta Selatan", line: "blue" },
+  { id: 5, name: "Blok A", city: "Jakarta Selatan", line: "blue" },
+  { id: 6, name: "Blok M BCA", city: "Jakarta Selatan", line: "blue" },
+  { id: 7, name: "ASEAN", city: "Jakarta Selatan", line: "blue", isTransfer: true },
+  { id: 8, name: "Senayan", city: "Jakarta Selatan", line: "blue" },
+  { id: 9, name: "Istora Mandiri", city: "Jakarta Pusat", line: "blue", isTransfer: true },
+  { id: 10, name: "Bendungan Hilir", city: "Jakarta Pusat", line: "blue" },
+  { id: 11, name: "Setiabudi Astra", city: "Jakarta Pusat", line: "blue" },
+  { id: 12, name: "Dukuh Atas BNI", city: "Jakarta Pusat", line: "blue" },
+  { id: 13, name: "Bundaran HI", city: "Jakarta Pusat", line: "blue" },
+  
+  // East Branch (Red Line)
+  { id: 14, name: "Taman Anggrek", city: "Jakarta Barat", line: "red" },
+  { id: 15, name: "Central Park", city: "Jakarta Barat", line: "red" },
+  { id: 16, name: "Tanjung Duren", city: "Jakarta Barat", line: "red" },
+  { id: 17, name: "Kemanggisan", city: "Jakarta Barat", line: "red" },
+  
+  // West Branch (Green Line)
+  { id: 18, name: "Palmerah", city: "Jakarta Selatan", line: "green" },
+  { id: 19, name: "Kebayoran Lama", city: "Jakarta Selatan", line: "green" },
+  { id: 20, name: "Pondok Indah", city: "Jakarta Selatan", line: "green" },
+  { id: 21, name: "Lebak Bulus 2", city: "Jakarta Selatan", line: "green" },
 ]
 
 export default function Home() {
@@ -84,22 +97,21 @@ export default function Home() {
           <h1 className="text-2xl font-bold">Railnet</h1>
         </Link>
         <div className="hidden sm:flex space-x-6">
-          <Link href="/" className="hover:underline">Home</Link>
           <Link href="/schedule" className="hover:underline">Schedule</Link>
-          <Link href="#" className="hover:underline">Tickets</Link>
+          <Link href="#" className="hover:underline">Route & Tickets</Link>
           <Link href="#" className="hover:underline">Help</Link>
         </div>
       </div>
       
       {/* Hero Section */}
       <div className="w-full bg-blue-800 text-white py-16 px-4 flex flex-col items-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Travel Across Cities with Railnet</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Travel Across Jakarta with Railnet</h1>
         <p className="text-xl md:text-2xl mb-8 text-center max-w-2xl">Fast, reliable, and comfortable inter-city train service</p>
       </div>
       
       {/* Booking Form */}
       <div className="relative -mt-10 w-11/12 max-w-3xl bg-white rounded-lg shadow-xl p-6 mb-12">
-        <h2 className="text-2xl font-bold mb-6 text-black">Book Your Journey</h2>
+        <h2 className="text-2xl font-bold mb-6 text-black">Book Your Train</h2>
         
         {/* Error message */}
         {error && (
