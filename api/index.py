@@ -1,8 +1,10 @@
 from flask import Flask, jsonify, request
 import heapq
 from typing import Dict, List, Tuple
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Jakarta MRT Network Graph (matching your frontend schedule)
 STATIONS = {
@@ -34,34 +36,34 @@ STATIONS = {
     'LB2': 'Lebak Bulus 2'
 }
 
-# Updated Graph with ALL connections
+# Updated Graph with only stations from the STATIONS dictionary
 NETWORK_GRAPH = {
     # Blue Line Main Route
-    'HI': [('BNR', 1.2)],
-    'BNR': [('HI', 1.2), ('DKT', 1.8)],
-    'DKT': [('BNR', 1.8), ('STF', 1.5), ('KUN', 2.1), ('PRI', 3.2)],  # Transfer hub
+    'BNR': [('DKT', 1.8)],
+    'DKT': [('BNR', 1.8), ('STF', 1.5)],
     'STF': [('DKT', 1.5), ('BKS', 1.3)],
     'BKS': [('STF', 1.3), ('IST', 1.1)],
-    'IST': [('BKS', 1.1), ('SNY', 1.4)],
-    'SNY': [('IST', 1.4), ('SNP', 1.0)],
-    'SNP': [('SNY', 1.0), ('ASN', 1.2)],
-    'ASN': [('SNP', 1.2), ('BLM', 1.6)],
-    'BLM': [('ASN', 1.6), ('BLA', 1.0), ('PAN', 2.3)],  # Transfer to Red line
+    'IST': [('BKS', 1.1), ('SNY', 1.4), ('TAN', 2.3)],  # Added connection to Red Line
+    'SNY': [('IST', 1.4), ('ASN', 1.2)],
+    'ASN': [('SNY', 1.2), ('BLM', 1.6), ('PAL', 1.9)],  # Added connection to Green Line
+    'BLM': [('ASN', 1.6), ('BLA', 1.0)],
     'BLA': [('BLM', 1.0), ('FTM', 1.4)],
     'FTM': [('BLA', 1.4), ('CPR', 1.2)],
     'CPR': [('FTM', 1.2), ('HJN', 1.1)],
-    'HJN': [('CPR', 1.1), ('CLD', 1.5)],
-    'CLD': [('HJN', 1.5), ('LEB', 1.8)],
-    'LEB': [('CLD', 1.8)],
+    'HJN': [('CPR', 1.1), ('LEB', 1.5)],
+    'LEB': [('HJN', 1.5)],
     
-    # Red Line (East Branch)
-    'KUN': [('DKT', 2.1), ('PAN', 1.9)],
-    'PAN': [('KUN', 1.9), ('BLM', 2.3), ('CKK', 1.7)],
-    'CKK': [('PAN', 1.7), ('CLW', 1.4)],
-    'CLW': [('CKK', 1.4)],
+    # Red Line (East Branch) - Modified to connect to IST instead of DKT
+    'TAN': [('CEN', 1.5), ('IST', 2.3)],  # Added connection to Blue Line (IST)
+    'CEN': [('TAN', 1.5), ('TAD', 1.3)],
+    'TAD': [('CEN', 1.3), ('KEM', 1.2)],
+    'KEM': [('TAD', 1.2)],  # Removed connection to DKT
     
-    # Green Line (West Branch)
-    'PRI': [('DKT', 3.2)]
+    # Green Line (West Branch) - Modified to connect to ASN instead of DKT
+    'PAL': [('KBL', 1.8), ('ASN', 1.9)],  # Changed connection from DKT to ASN
+    'KBL': [('PAL', 1.8), ('PON', 2.0)],
+    'PON': [('KBL', 2.0), ('LB2', 1.7)],
+    'LB2': [('PON', 1.7)]
 }
 
 def dijkstra_shortest_path(graph: Dict, start: str, end: str) -> Tuple[List[str], float]:
@@ -130,51 +132,93 @@ def find_shortest_route():
     """
     Find shortest route between two stations using Dijkstra's algorithm
     """
-    data = request.get_json()
-    start_station = data.get('from')
-    end_station = data.get('to')
-    
-    if not start_station or not end_station:
-        return jsonify({"error": "Missing 'from' or 'to' station"}), 400
-    
-    if start_station not in NETWORK_GRAPH or end_station not in NETWORK_GRAPH:
-        return jsonify({"error": "Invalid station code"}), 400
-    
-    # Find shortest path by distance
-    shortest_path, distance = dijkstra_shortest_path(NETWORK_GRAPH, start_station, end_station)
-    
-    # Find path with minimum transfers
-    min_transfer_path, transfers = bfs_min_transfers(NETWORK_GRAPH, start_station, end_station)
-    
-    if not shortest_path:
-        return jsonify({"error": "No route found"}), 404
-    
-    # Calculate travel time (assume 3 min between stations + 2 min per transfer)
-    travel_time = (len(shortest_path) - 1) * 3 + max(0, len(shortest_path) - 2) * 2
-    
-    # Calculate price based on distance (IDR 3000 base + IDR 2000 per km)
-    price = 3000 + int(distance * 2000)
-    
-    return jsonify({
-        "route": {
-            "from": {"code": start_station, "name": STATIONS[start_station]},
-            "to": {"code": end_station, "name": STATIONS[end_station]},
-            "shortest_distance": {
-                "path": shortest_path,
-                "stations": [STATIONS[code] for code in shortest_path],
-                "distance_km": round(distance, 2),
-                "travel_time_minutes": travel_time,
-                "price_idr": price
+    try:
+        data = request.get_json()
+        start_station = data.get('from')
+        end_station = data.get('to')
+        
+        if not start_station or not end_station:
+            return jsonify({"error": "Missing 'from' or 'to' station"}), 400
+        
+        # Create a reverse mapping from station code to station code in NETWORK_GRAPH
+        network_station_map = {code: code for code in NETWORK_GRAPH.keys()}
+        
+        # Add mapping for station codes in STATIONS that might not exactly match NETWORK_GRAPH
+        for code in STATIONS.keys():
+            if code not in network_station_map:
+                # Try to find a matching station in NETWORK_GRAPH
+                for network_code in NETWORK_GRAPH.keys():
+                    if network_code == code or network_code.startswith(code):
+                        network_station_map[code] = network_code
+                        break
+        
+        # Convert input station codes to network graph codes
+        start_network_code = network_station_map.get(start_station, start_station)
+        end_network_code = network_station_map.get(end_station, end_station)
+        
+        if start_network_code not in NETWORK_GRAPH:
+            return jsonify({"error": f"Start station code '{start_station}' not found in network"}), 400
+        
+        if end_network_code not in NETWORK_GRAPH:
+            return jsonify({"error": f"End station code '{end_station}' not found in network"}), 400
+        
+        # Find shortest path by distance
+        shortest_path, distance = dijkstra_shortest_path(NETWORK_GRAPH, start_network_code, end_network_code)
+        
+        # Find path with minimum transfers
+        min_transfer_path, transfers = bfs_min_transfers(NETWORK_GRAPH, start_network_code, end_network_code)
+        
+        if not shortest_path:
+            return jsonify({"error": "No route found between specified stations"}), 404
+        
+        # Calculate travel time (assume 3 min between stations + 2 min per transfer)
+        travel_time = (len(shortest_path) - 1) * 3 + max(0, len(shortest_path) - 2) * 2
+        
+        # Calculate price based on distance (IDR 3000 base + IDR 2000 per km)
+        price = 3000 + int(distance * 2000)
+        
+        # Safe lookup for station names
+        def get_station_name(code):
+            # Try direct lookup first
+            if code in STATIONS:
+                return STATIONS[code]
+            # Try to find a close match
+            for station_code, name in STATIONS.items():
+                if station_code in code or code in station_code:
+                    return name
+            return f"Station {code}"  # Fallback
+        
+        start_name = get_station_name(start_station)
+        end_name = get_station_name(end_station)
+        
+        # Convert path codes to station names safely
+        shortest_path_names = [get_station_name(code) for code in shortest_path]
+        min_transfer_names = [get_station_name(code) for code in min_transfer_path]
+        
+        return jsonify({
+            "route": {
+                "from": {"code": start_station, "name": start_name},
+                "to": {"code": end_station, "name": end_name},
+                "shortest_distance": {
+                    "path": shortest_path,
+                    "stations": shortest_path_names,
+                    "distance_km": round(distance, 2),
+                    "travel_time_minutes": travel_time,
+                    "price_idr": price
+                },
+                "min_transfers": {
+                    "path": min_transfer_path,
+                    "stations": min_transfer_names,
+                    "transfers": transfers,
+                    "travel_time_minutes": (len(min_transfer_path) - 1) * 3 + transfers * 2
+                }
             },
-            "min_transfers": {
-                "path": min_transfer_path,
-                "stations": [STATIONS[code] for code in min_transfer_path],
-                "transfers": transfers,
-                "travel_time_minutes": (len(min_transfer_path) - 1) * 3 + transfers * 2
-            }
-        },
-        "algorithm_used": ["Dijkstra (shortest distance)", "BFS (minimum transfers)"]
-    })
+            "algorithm_used": ["Dijkstra (shortest distance)", "BFS (minimum transfers)"]
+        })
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error in find_shortest_route: {str(e)}")
+        return jsonify({"error": "An internal server error occurred", "details": str(e)}), 500
 
 @app.route("/api/network-analysis", methods=['GET'])
 def network_analysis():
