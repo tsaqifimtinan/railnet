@@ -148,7 +148,7 @@ export default function Home() {
       console.log(`Sending request: from=${fromCode}, to=${toCode}`)
 
       // Using fetch API with the correct endpoint
-      const response = await fetch('https://railnet.vercel.app//api/shortest-route', {
+      const response = await fetch('https://railnet.vercel.app/api/shortest-route', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
