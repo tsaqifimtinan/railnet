@@ -1,116 +1,249 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
+import { useState } from 'react'
+
+// Dummy data for MRT Jakarta stations
+const stations = [
+  { id: 1, name: "Lebak Bulus Grab", city: "Jakarta Selatan" },
+  { id: 2, name: "Fatmawati", city: "Jakarta Selatan" },
+  { id: 3, name: "Cipete Raya", city: "Jakarta Selatan" },
+  { id: 4, name: "Haji Nawi", city: "Jakarta Selatan" },
+  { id: 5, name: "Blok A", city: "Jakarta Selatan" },
+  { id: 6, name: "Blok M BCA", city: "Jakarta Selatan" },
+  { id: 7, name: "ASEAN", city: "Jakarta Selatan" },
+  { id: 8, name: "Senayan", city: "Jakarta Selatan" },
+  { id: 9, name: "Istora Mandiri", city: "Jakarta Pusat" },
+  { id: 10, name: "Bendungan Hilir", city: "Jakarta Pusat" },
+  { id: 11, name: "Setiabudi Astra", city: "Jakarta Pusat" },
+  { id: 12, name: "Dukuh Atas BNI", city: "Jakarta Pusat" },
+  { id: 13, name: "Bundaran HI", city: "Jakarta Pusat" },
+]
 
 export default function Home() {
+  const [fromStation, setFromStation] = useState('')
+  const [toStation, setToStation] = useState('')
+  const [error, setError] = useState('')
+  const [selectedDate, setSelectedDate] = useState('')
+  
+  // Handler for the "From" station selection
+  const handleFromChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = e.target.value
+    setFromStation(selected)
+    
+    // Check if "From" and "To" are the same
+    if (selected === toStation) {
+      setError('Departure and arrival stations cannot be the same')
+    } else {
+      setError('')
+    }
+  }
+  
+  // Handler for the "To" station selection
+  const handleToChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = e.target.value
+    setToStation(selected)
+    
+    // Check if "From" and "To" are the same
+    if (selected === fromStation) {
+      setError('Departure and arrival stations cannot be the same')
+    } else {
+      setError('')
+    }
+  }
+  
+  // Handler for search button
+  const handleSearch = () => {
+    if (!fromStation || !toStation) {
+      setError('Please select both departure and arrival stations')
+      return
+    }
+    
+    if (fromStation === toStation) {
+      setError('Departure and arrival stations cannot be the same')
+      return
+    }
+    
+    if (!selectedDate) {
+      setError('Please select a travel date')
+      return
+    }
+    
+    // Here you would typically navigate to search results or perform an API call
+    alert(`Searching for trains from ${fromStation} to ${toStation} on ${selectedDate}`)
+    setError('')
+  }
+  
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <Link href="/api/python">
-            <code className="font-mono font-bold">api/index.py</code>
-          </Link>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main className="flex min-h-screen flex-col items-center bg-gradient-to-b from-blue-50 to-white">
+      {/* Header */}
+      <div className="w-full bg-blue-700 text-white py-4 px-6 flex justify-between items-center">
+        <Link href="/" className="flex items-center">
+          <div className="text-2xl font-bold mr-2">🚄</div>
+          <h1 className="text-2xl font-bold">Railnet</h1>
+        </Link>
+        <div className="hidden sm:flex space-x-6">
+          <Link href="/" className="hover:underline">Home</Link>
+          <Link href="/schedule" className="hover:underline">Schedule</Link>
+          <Link href="#" className="hover:underline">Tickets</Link>
+          <Link href="#" className="hover:underline">Help</Link>
         </div>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      
+      {/* Hero Section */}
+      <div className="w-full bg-blue-800 text-white py-16 px-4 flex flex-col items-center">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">Travel Across Cities with Railnet</h1>
+        <p className="text-xl md:text-2xl mb-8 text-center max-w-2xl">Fast, reliable, and comfortable inter-city train service</p>
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
+      
+      {/* Booking Form */}
+      <div className="relative -mt-10 w-11/12 max-w-3xl bg-white rounded-lg shadow-xl p-6 mb-12">
+        <h2 className="text-2xl font-bold mb-6 text-black">Book Your Journey</h2>
+        
+        {/* Error message */}
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+            <p>{error}</p>
+          </div>
+        )}
+        
+        <div className="flex flex-col md:flex-row gap-4 mb-4">          {/* From Station */}
+          <div className="flex-1">
+            <label htmlFor="fromStation" className="block text-sm font-medium text-black mb-1">
+              From
+            </label>
+            <select
+              id="fromStation"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-black"
+              value={fromStation}
+              onChange={handleFromChange}
+              required
+            >
+              <option value="">Select departure station</option>
+              {stations.map((station) => (
+                <option key={station.id} value={station.name}>
+                  {station.name}, {station.city}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          {/* To Station */}
+          <div className="flex-1">
+            <label htmlFor="toStation" className="block text-sm font-medium text-black mb-1">
+              To
+            </label>
+            <select
+              id="toStation"
+              className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-black"
+              value={toStation}
+              onChange={handleToChange}
+              required
+            >
+              <option value="">Select arrival station</option>
+              {stations.map((station) => (
+                <option key={station.id} value={station.name}>
+                  {station.name}, {station.city}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        
+        {/* Date Selection */}
+        <div className="mb-6">
+          <label htmlFor="travelDate" className="block text-sm font-medium text-black mb-1">
+            Date of Travel
+          </label>
+          <input
+            type="date"
+            id="travelDate"
+            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 text-black"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            min={new Date().toISOString().split('T')[0]} // Prevent selecting past dates
+            required
+          />
+        </div>
+        
+        {/* Search Button */}
+        <button
+          onClick={handleSearch}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-md shadow transition duration-200"
         >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+          Search Trains
+        </button>
       </div>
+      
+      {/* Features Section */}
+      <div className="w-full max-w-6xl px-4 mb-16">
+        <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">Why Choose Railnet?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Feature 1 */}
+          <div className="bg-white rounded-lg p-6 shadow-md">
+            <div className="text-4xl mb-4">⚡</div>
+            <h3 className="text-xl font-semibold mb-2">Fast Connections</h3>
+            <p className="text-gray-600">High-speed trains connecting major cities with minimal stops and maximum comfort.</p>
+          </div>
+          
+          {/* Feature 2 */}
+          <div className="bg-white rounded-lg p-6 shadow-md">
+            <div className="text-4xl mb-4">🌿</div>
+            <h3 className="text-xl font-semibold mb-2">Eco-Friendly</h3>
+            <p className="text-gray-600">Reduce your carbon footprint by choosing rail travel over cars or planes.</p>
+          </div>
+          
+          {/* Feature 3 */}
+          <div className="bg-white rounded-lg p-6 shadow-md">
+            <div className="text-4xl mb-4">💳</div>
+            <h3 className="text-xl font-semibold mb-2">Easy Booking</h3>
+            <p className="text-gray-600">Simple online booking with flexible tickets and mobile passes.</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Footer */}
+      <footer className="w-full bg-gray-800 text-white py-8 px-4">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between">
+          <div className="mb-6 md:mb-0">
+            <div className="flex items-center">
+              <div className="text-2xl mr-2">🚄</div>
+              <h2 className="text-xl font-bold">Railnet</h2>
+            </div>
+            <p className="mt-2 text-gray-400">Connecting cities, connecting people.</p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Company</h3>
+              <ul className="space-y-1">
+                <li><Link href="#" className="text-gray-400 hover:text-white">About</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">Careers</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">Press</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Support</h3>
+              <ul className="space-y-1">
+                <li><Link href="#" className="text-gray-400 hover:text-white">Help Center</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">Contact Us</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">FAQs</Link></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Legal</h3>
+              <ul className="space-y-1">
+                <li><Link href="#" className="text-gray-400 hover:text-white">Privacy</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">Terms</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white">Accessibility</Link></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
     </main>
   )
 }
