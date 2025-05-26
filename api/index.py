@@ -1,12 +1,12 @@
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request
 import heapq
 import json
 from typing import Dict, List, Tuple
 from flask_cors import CORS
 
 app = Flask(__name__)
-# Enable CORS for all routes with additional settings for Vercel
-CORS(app, resources={r"/api/*": {"origins": "*", "allow_headers": "*", "expose_headers": "*"}})
+# Enable CORS for all routes
+CORS(app)
 
 # Jakarta MRT Network Graph (matching your frontend schedule)
 STATIONS = {
@@ -125,7 +125,7 @@ def bfs_min_transfers(graph: Dict, start: str, end: str) -> Tuple[List[str], int
     
     return [], -1  # No path found
 
-@app.route("/api/python")
+@app.route("/python")
 def hello_world():
     """Test endpoint to verify API is working"""
     return jsonify({
@@ -134,7 +134,7 @@ def hello_world():
         "serverless": True
     })
 
-@app.route("/api/shortest-route", methods=['POST'])
+@app.route("/shortest-route", methods=['POST'])
 def find_shortest_route():
     """
     Find shortest route between two stations using Dijkstra's algorithm
@@ -227,7 +227,7 @@ def find_shortest_route():
         print(f"Error in find_shortest_route: {str(e)}")
         return jsonify({"error": "An internal server error occurred", "details": str(e)}), 500
 
-@app.route("/api/network-analysis", methods=['GET'])
+@app.route("/network-analysis", methods=['GET'])
 def network_analysis():
     """
     Analyze the entire MRT network using graph algorithms
@@ -262,44 +262,14 @@ def network_analysis():
         "algorithms_used": ["Dijkstra (all-pairs shortest path)"]
     })
 
-# This is the correct handler format for Vercel serverless functions with Flask
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def catch_all(path):
-    """Catch-all route to handle all requests that don't match existing routes"""
-    if not path:
-        return jsonify({"status": "API is running", "endpoints": ["/api/python", "/api/shortest-route", "/api/network-analysis"]})
-    return jsonify({"error": f"Route /{path} not found"}), 404
-
-def handler(event, context):
-    """
-    This is the serverless function handler for Vercel
-    Required for Python serverless functions on Vercel
-    """
-    payload = json.loads(event['body']) if event.get('body') else {}
-    headers = event.get('headers', {})
-    path = event.get('path', '')
-    method = event.get('httpMethod', 'GET')
-    query = event.get('queryStringParameters', {}) or {}
-    
-    # Create a flask context
-    with app.test_request_context(
-        path=path,
-        method=method,
-        headers=headers,
-        data=json.dumps(payload) if payload else None,
-        query_string=query
-    ):
-        # Dispatch the request to Flask and get the response
-        response = app.full_dispatch_request()
-        
-        # Convert the response to the format expected by Vercel
-        return {
-            'statusCode': response.status_code,
-            'headers': dict(response.headers),
-            'body': response.get_data(as_text=True),
-            'isBase64Encoded': False
-        }
+# Root route for health check
+@app.route("/")
+def root():
+    """Root endpoint for health check"""
+    return jsonify({
+        "status": "API is running", 
+        "endpoints": ["/api/python", "/api/shortest-route", "/api/network-analysis"]
+    })
 
 # This is for local development
 if __name__ == '__main__':

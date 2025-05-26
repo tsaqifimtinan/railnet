@@ -1,15 +1,15 @@
 {
   "name": "next-flask",
   "version": "0.1.0",
-  "private": true,
-  "scripts": {
+  "private": true,  "scripts": {
     "flask-dev": "set FLASK_DEBUG=1 && python -m flask --app api/index run -p 5328",
     "next-dev": "next dev",
     "dev": "concurrently \"npm run next-dev\" \"npm run flask-dev\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "install-deps": "pip install -r requirements.txt"
+    "install-deps": "pip install -r requirements.txt",
+    "test-api": "node test-deployment.js"
   },
   "dependencies": {
     "@types/node": "20.1.4",
