@@ -8,10 +8,9 @@ const API_BASE = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 
 async function testEndpoints() {
   console.log(`Testing API at: ${API_BASE}`);
   
-  try {
-    // Test health check
+  try {    // Test health check
     console.log('\n1. Testing health check endpoint...');
-    const healthResponse = await fetch(`${API_BASE}/python`);
+    const healthResponse = await fetch(`${API_BASE}/api/python`);
     if (healthResponse.ok) {
       const healthData = await healthResponse.json();
       console.log('✅ Health check passed:', healthData);
@@ -21,7 +20,7 @@ async function testEndpoints() {
 
     // Test shortest route endpoint
     console.log('\n2. Testing shortest route endpoint...');
-    const routeResponse = await fetch(`${API_BASE}/shortest-route`, {
+    const routeResponse = await fetch(`${API_BASE}/api/shortest-route`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,11 +40,9 @@ async function testEndpoints() {
       console.log('❌ Route calculation failed:', routeResponse.status, routeResponse.statusText);
       const errorText = await routeResponse.text();
       console.log('Error details:', errorText);
-    }
-
-    // Test network analysis endpoint
+    }    // Test network analysis endpoint
     console.log('\n3. Testing network analysis endpoint...');
-    const analysisResponse = await fetch(`${API_BASE}/network-analysis`);
+    const analysisResponse = await fetch(`${API_BASE}/api/network-analysis`);
     if (analysisResponse.ok) {
       const analysisData = await analysisResponse.json();
       console.log('✅ Network analysis passed');

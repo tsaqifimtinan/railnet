@@ -125,7 +125,7 @@ def bfs_min_transfers(graph: Dict, start: str, end: str) -> Tuple[List[str], int
     
     return [], -1  # No path found
 
-@app.route("/python")
+@app.route("/api/python")
 def hello_world():
     """Test endpoint to verify API is working"""
     return jsonify({
@@ -134,7 +134,7 @@ def hello_world():
         "serverless": True
     })
 
-@app.route("/shortest-route", methods=['POST'])
+@app.route("/api/shortest-route", methods=['POST'])
 def find_shortest_route():
     """
     Find shortest route between two stations using Dijkstra's algorithm
@@ -227,7 +227,7 @@ def find_shortest_route():
         print(f"Error in find_shortest_route: {str(e)}")
         return jsonify({"error": "An internal server error occurred", "details": str(e)}), 500
 
-@app.route("/network-analysis", methods=['GET'])
+@app.route("/api/network-analysis", methods=['GET'])
 def network_analysis():
     """
     Analyze the entire MRT network using graph algorithms
