@@ -3,7 +3,7 @@
 async function testFlaskApi() {
   try {
     console.log('Testing Flask API at http://localhost:5328/api/shortest-route...');
-    const response = await fetch('http://localhost:5328/api/shortest-route', {
+    const response = await fetch('https://railnet-backend.vercel.app/api/shortest-route', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
