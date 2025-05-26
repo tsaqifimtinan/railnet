@@ -1,10 +1,12 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 import heapq
+import json
 from typing import Dict, List, Tuple
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Enable CORS for all routes with additional settings for Vercel
+CORS(app, resources={r"/api/*": {"origins": "*", "allow_headers": "*", "expose_headers": "*"}})
 
 # Jakarta MRT Network Graph (matching your frontend schedule)
 STATIONS = {
@@ -125,7 +127,12 @@ def bfs_min_transfers(graph: Dict, start: str, end: str) -> Tuple[List[str], int
 
 @app.route("/api/python")
 def hello_world():
-    return "<p>Hello, World!</p>"
+    """Test endpoint to verify API is working"""
+    return jsonify({
+        "message": "Hello, World!",
+        "status": "API is running correctly",
+        "serverless": True
+    })
 
 @app.route("/api/shortest-route", methods=['POST'])
 def find_shortest_route():
@@ -255,11 +262,45 @@ def network_analysis():
         "algorithms_used": ["Dijkstra (all-pairs shortest path)"]
     })
 
-def handler(request, context):
+# This is the correct handler format for Vercel serverless functions with Flask
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    """Catch-all route to handle all requests that don't match existing routes"""
+    if not path:
+        return jsonify({"status": "API is running", "endpoints": ["/api/python", "/api/shortest-route", "/api/network-analysis"]})
+    return jsonify({"error": f"Route /{path} not found"}), 404
+
+def handler(event, context):
     """
     This is the serverless function handler for Vercel
+    Required for Python serverless functions on Vercel
     """
-    return app(request)
+    payload = json.loads(event['body']) if event.get('body') else {}
+    headers = event.get('headers', {})
+    path = event.get('path', '')
+    method = event.get('httpMethod', 'GET')
+    query = event.get('queryStringParameters', {}) or {}
+    
+    # Create a flask context
+    with app.test_request_context(
+        path=path,
+        method=method,
+        headers=headers,
+        data=json.dumps(payload) if payload else None,
+        query_string=query
+    ):
+        # Dispatch the request to Flask and get the response
+        response = app.full_dispatch_request()
+        
+        # Convert the response to the format expected by Vercel
+        return {
+            'statusCode': response.status_code,
+            'headers': dict(response.headers),
+            'body': response.get_data(as_text=True),
+            'isBase64Encoded': False
+        }
 
+# This is for local development
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5328)

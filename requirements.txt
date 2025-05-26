@@ -1,2 +1,6 @@
 flask==3.0.0
 flask-cors==3.0.10
+werkzeug==3.0.1
+itsdangerous==2.2.0
+MarkupSafe==2.1.5
+Jinja2==3.1.3
