@@ -67,34 +67,58 @@ Coordinate = {
     'LB2' : [-6.299031, 106.763768]
 }
 
+def euclidean_distance(start: str, end: str) -> float:
+    if start not in Coordinate or end not in Coordinate:
+        return 0
+    
+    lat1, lon1 = Coordinate[start]
+    lat2, lon2 = Coordinate[end]
+    
+    # Calculate differences in latitude and longitude
+    # 1 degree latitude is approximately 111 km
+    
+    lat_diff_km = (lat2-lat1) * 111
+    
+    # 1 degree longitude varies by latitude, so we use the average latitude
+    # to calculate the distance in km
+    
+    avg_lat = (lat1 + lat2) / 2
+    import math
+    lon_diff_km = (lon2-lon1) * (111 * math.cos(math.radians(avg_lat)))
+    
+    #Calculate Euclidean distance
+    distance = math.sqrt(lat_diff_km**2 + lon_diff_km**2)
+    
+    return distance
+
 # Updated Graph with only stations from the STATIONS dictionary
 NETWORK_GRAPH = {
     # Blue Line Main Route
-    'BNR': [('DKT', 1.8)],
-    'DKT': [('BNR', 1.8), ('STF', 1.5)],
-    'STF': [('DKT', 1.5), ('BKS', 1.3)],
-    'BKS': [('STF', 1.3), ('IST', 1.1)],
-    'IST': [('BKS', 1.1), ('SNY', 1.4), ('TAN', 2.3)],  # Added connection to Red Line
-    'SNY': [('IST', 1.4), ('ASN', 1.2)],
-    'ASN': [('SNY', 1.2), ('BLM', 1.6), ('PAL', 1.9)],  # Added connection to Green Line
-    'BLM': [('ASN', 1.6), ('BLA', 1.0)],
-    'BLA': [('BLM', 1.0), ('FTM', 1.4)],
-    'FTM': [('BLA', 1.4), ('CPR', 1.2)],
-    'CPR': [('FTM', 1.2), ('HJN', 1.1)],
-    'HJN': [('CPR', 1.1), ('LEB', 1.5)],
-    'LEB': [('HJN', 1.5)],
+    'BNR': [('DKT', euclidean_distance('BNR', 'DKT'))],
+    'DKT': [('BNR', euclidean_distance('DKT', 'BNR')), ('STF', euclidean_distance('DKT', 'STF'))],
+    'STF': [('DKT', euclidean_distance('STF', 'DKT')), ('BKS', euclidean_distance('STF', 'BKS'))],
+    'BKS': [('STF', euclidean_distance('BKS', 'STF')), ('IST', euclidean_distance('BKS', 'IST'))],
+    'IST': [('BKS', euclidean_distance('IST', 'BKS')), ('SNY', euclidean_distance('IST', 'SNY')), ('TAN', euclidean_distance('IST', 'TAN'))],  # Added connection to Red Line
+    'SNY': [('IST', euclidean_distance('SNY', 'IST')), ('ASN', euclidean_distance('SNY', 'ASN'))],
+    'ASN': [('SNY', euclidean_distance('ASN', 'SNY')), ('BLM', euclidean_distance('ASN', 'BLM')), ('PAL', euclidean_distance('ASN', 'PAL'))],  # Added connection to Green Line
+    'BLM': [('ASN', euclidean_distance('BLM', 'ASN')), ('BLA', euclidean_distance('BLM', 'BLA'))],
+    'BLA': [('BLM', euclidean_distance('BLA', 'BLM')), ('FTM', euclidean_distance('BLA', 'FTM'))],
+    'FTM': [('BLA', euclidean_distance('FTM', 'BLA')), ('CPR', euclidean_distance('FTM', 'CPR'))],
+    'CPR': [('FTM', euclidean_distance('CPR', 'FTM')), ('HJN', euclidean_distance('CPR', 'HJN'))],
+    'HJN': [('CPR', euclidean_distance('HJN', 'CPR')), ('LEB', euclidean_distance('HJN', 'LEB'))],
+    'LEB': [('HJN', euclidean_distance('LEB', 'HJN'))],
     
     # Red Line (East Branch) - Modified to connect to IST instead of DKT
-    'TAN': [('CEN', 1.5), ('IST', 2.3)],  # Added connection to Blue Line (IST)
-    'CEN': [('TAN', 1.5), ('TAD', 1.3)],
-    'TAD': [('CEN', 1.3), ('KEM', 1.2)],
-    'KEM': [('TAD', 1.2)],  # Removed connection to DKT
+    'TAN': [('CEN', euclidean_distance('TAN', 'CEN')), ('IST', euclidean_distance('TAN', 'IST'))],  # Added connection to Blue Line (IST)
+    'CEN': [('TAN', euclidean_distance('CEN', 'TAN')), ('TAD', euclidean_distance('CEN', 'TAD'))],
+    'TAD': [('CEN', euclidean_distance('TAD', 'CEN')), ('KEM', euclidean_distance('TAD', 'KEM'))],
+    'KEM': [('TAD', euclidean_distance('KEM', 'TAD'))],  # Removed connection to DKT
     
     # Green Line (West Branch) - Modified to connect to ASN instead of DKT
-    'PAL': [('KBL', 1.8), ('ASN', 1.9)],  # Changed connection from DKT to ASN
-    'KBL': [('PAL', 1.8), ('PON', 2.0)],
-    'PON': [('KBL', 2.0), ('LB2', 1.7)],
-    'LB2': [('PON', 1.7)]
+    'PAL': [('KBL', euclidean_distance('PAL', 'KBL')), ('ASN', euclidean_distance('PAL', 'ASN'))],  # Changed connection from DKT to ASN
+    'KBL': [('PAL', euclidean_distance('KBL', 'PAL')), ('PON', euclidean_distance('KBL', 'PON'))],
+    'PON': [('KBL', euclidean_distance('PON', 'KBL')), ('LB2', euclidean_distance('PON', 'LB2'))],
+    'LB2': [('PON', euclidean_distance('LB2', 'PON'))]
 }
 
 def dijkstra_shortest_path(graph: Dict, start: str, end: str) -> Tuple[List[str], float]:
