@@ -255,5 +255,11 @@ def network_analysis():
         "algorithms_used": ["Dijkstra (all-pairs shortest path)"]
     })
 
+def handler(request, context):
+    """
+    This is the serverless function handler for Vercel
+    """
+    return app(request)
+
 if __name__ == '__main__':
     app.run(debug=True)
