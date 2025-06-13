@@ -1,60 +1,120 @@
 <p align="center">
-  <a href="https://nextjs-flask-starter.vercel.app/">
-    <img src="https://assets.vercel.com/image/upload/v1588805858/repositories/vercel/logo.png" height="96">
-    <h3 align="center">Next.js Flask Starter</h3>
+  <a href="#railnet">
+    <div style="font-size: 96px;">🚄</div>
+    <h3 align="center">Railnet</h3>
   </a>
 </p>
 
-<p align="center">Simple Next.js boilerplate that uses <a href="https://flask.palletsprojects.com/">Flask</a> as the API backend.</p>
+<p align="center">A modern rail network booking system built with Next.js and Flask, featuring the Jakarta MRT network with smart route planning.</p>
 
 <br/>
 
-## Introduction
+## About Railnet
 
-This is a hybrid Next.js + Python app that uses Next.js as the frontend and Flask as the API backend. One great use case of this is to write Next.js apps that use Python AI libraries on the backend.
+Railnet is a comprehensive train booking and route planning application that simulates the Jakarta MRT (Mass Rapid Transit) system. The app helps users find optimal routes between stations, view train schedules, and manage their ticket bookings.
 
-## How It Works
+### Key Features
 
-The Python/Flask server is mapped into to Next.js app under `/api/`.
+- **Smart Route Planning**: Uses Dijkstra's algorithm to find the shortest routes and BFS for minimum transfers
+- **Real-time Schedule Display**: Interactive train schedules across Blue, Red, and Green lines
+- **Ticket Management**: Book, view, and manage train tickets with different fare types
+- **Multi-line Network**: Supports the complete Jakarta MRT network with transfer stations
+- **Modern UI**: Clean, responsive design with line-specific color coding
 
-This is implemented using [`next.config.js` rewrites](https://github.com/vercel/examples/blob/main/python/nextjs-flask/next.config.js) to map any request to `/api/:path*` to the Flask API, which is hosted in the `/api` folder.
+### How It Works
 
-On localhost, the rewrite will be made to the `127.0.0.1:5328` port, which is where the Flask server is running.
+**Frontend (Next.js)**:
+- Interactive route finder with station selection
+- Train schedule viewer with line and direction filters  
+- Ticket booking and management system
+- Real-time route visualization
 
-In production, the Flask server is hosted as [Python serverless functions](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python) on Vercel.
+**Backend (Flask API)**:
+- Graph-based route calculation using advanced algorithms
+- Network analysis and optimization
+- RESTful API endpoints for route planning
+- Coordinate-based distance calculations
+
+The Flask API is integrated into the Next.js app through API routes and can be deployed as serverless functions.
+
+## How to Use Railnet
+
+### 1. Plan Your Route
+- Visit the homepage and select your departure and arrival stations
+- Choose your travel date
+- Click "Search Trains" to find optimal routes
+- View both shortest distance and minimum transfer options
+
+### 2. Check Train Schedules  
+- Navigate to the "Schedule" page
+- Select your line (Blue, Red, or Green) and direction
+- View detailed timetables for all trains on that route
+- See transfer stations and connection information
+
+### 3. Book and Manage Tickets
+- Go to "Route & Tickets" to view your bookings
+- Filter tickets by status (Upcoming, Completed, Cancelled)
+- Each ticket includes PNR, route details, and pricing
+- Cancel upcoming tickets if needed
+
+### 4. Navigate the Network
+The Jakarta MRT network consists of:
+- **Blue Line**: Main north-south corridor (Lebak Bulus → Bundaran HI)
+- **Red Line**: East branch connecting to Blue Line at Istora Mandiri
+- **Green Line**: West branch connecting to Blue Line at ASEAN station
 
 ## Demo
 
-https://nextjs-flask-starter.vercel.app/
+Try the live demo: [Railnet Demo](https://railnet-frontend.vercel.app/)
 
-## Deploy Your Own
+## Technical Architecture
 
-You can clone & deploy it to Vercel with one click:
+### Frontend Stack
+- **Next.js 14**: React framework with App Router
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Responsive styling
+- **React Components**: Interactive UI elements
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?demo-title=Next.js%20Flask%20Starter&demo-description=Simple%20Next.js%20boilerplate%20that%20uses%20Flask%20as%20the%20API%20backend.&demo-url=https%3A%2F%2Fnextjs-flask-starter.vercel.app%2F&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F795TzKM3irWu6KBCUPpPz%2F44e0c6622097b1eea9b48f732bf75d08%2FCleanShot_2023-05-23_at_12.02.15.png&project-name=Next.js%20Flask%20Starter&repository-name=nextjs-flask-starter&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fnextjs-flask&from=vercel-examples-repo)
+### Backend Stack  
+- **Flask**: Python web framework
+- **Graph Algorithms**: Dijkstra's and BFS for optimal routing
+- **CORS Support**: Cross-origin resource sharing
+- **Serverless Ready**: Deployable on Vercel Functions
 
-## Developing Locally
+### API Endpoints
+- `POST /api/shortest-route`: Find optimal routes between stations
+- `GET /api/network-analysis`: Analyze entire network statistics
+- `GET /api/python`: Health check endpoint
 
-You can clone & create this repo with the following command
+## Local Development
 
+### Prerequisites
+- Node.js 18+ and npm/yarn/pnpm
+- Python 3.8+ with pip
+
+### Setup Instructions
+
+1. **Clone the repository**
 ```bash
-npx create-next-app nextjs-flask --example "https://github.com/vercel/examples/tree/main/python/nextjs-flask"
+git clone <repository-url>
+cd railnet
 ```
 
-## Getting Started
-
-First, install the dependencies:
-
+2. **Install frontend dependencies**
 ```bash
 npm install
 # or
-yarn
-# or
+yarn install
+# or  
 pnpm install
 ```
 
-Then, run the development server:
+3. **Install Python dependencies**
+```bash
+pip install -r requirements.txt
+```
 
+4. **Start the development servers**
 ```bash
 npm run dev
 # or
@@ -63,16 +123,63 @@ yarn dev
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This starts:
+- Next.js frontend on [http://localhost:3000](http://localhost:3000)  
+- Flask API server on [http://127.0.0.1:5328](http://127.0.0.1:5328)
 
-The Flask server will be running on [http://127.0.0.1:5328](http://127.0.0.1:5328) – feel free to change the port in `package.json` (you'll also need to update it in `next.config.js`).
+### Development Notes
+- The Flask server is automatically proxied through Next.js via `next.config.js`
+- API routes are accessible at `/api/*` and mapped to the Flask backend
+- Hot reloading works for both frontend and backend changes
+- Backend logs appear in the terminal running the dev command
+
+## Deployment
+
+### Deploy to Vercel
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Connect your repository to Vercel
+3. Vercel automatically detects the Next.js + Python setup
+4. Your Flask API becomes serverless functions in production
+
+### Environment Configuration
+- Frontend deploys as static Next.js pages
+- Backend deploys as Python serverless functions
+- No additional configuration needed for basic deployment
+
+## Project Structure
+
+```
+railnet/
+├── app/                    # Next.js App Router pages
+│   ├── page.tsx           # Homepage with route finder
+│   ├── schedule/          # Train schedules page  
+│   └── route-tickets/     # Ticket management page
+├── api/                   # Flask backend
+│   ├── index.py          # Main API routes and algorithms
+│   └── requirements.txt   # Python dependencies
+├── public/               # Static assets
+├── next.config.js       # Next.js configuration & API proxy
+└── package.json         # Frontend dependencies
+```
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+### Technologies Used
+- [Next.js Documentation](https://nextjs.org/docs) - React framework with App Router
+- [Flask Documentation](https://flask.palletsprojects.com/) - Python web framework
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
+- [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [Flask Documentation](https://flask.palletsprojects.com/en/1.1.x/) - learn about Flask features and API.
+### Algorithms Implemented
+- **Dijkstra's Algorithm**: Finds shortest path by distance between stations
+- **Breadth-First Search (BFS)**: Finds route with minimum transfers
+- **Graph Theory**: Models the MRT network as a weighted graph
+- **Euclidean Distance**: Calculates real-world distances using coordinates
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Contributing
+
+We welcome contributions! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
