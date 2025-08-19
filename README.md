@@ -1,7 +1,6 @@
 <p align="center">
   <a href="#railnet">
-    <div style="font-size: 96px;">🚄</div>
-    <h3 align="center">Railnet</h3>
+    <h1 align="center">Railnet</h3>
   </a>
 </p>
 

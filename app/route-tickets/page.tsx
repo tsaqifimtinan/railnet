@@ -169,7 +169,7 @@ export default function RouteTicketsPage() {
       <div className="w-full bg-blue-700 text-white py-4 px-6 flex justify-between items-center">
         <Link href="/" className="flex items-center">
           <div className="text-2xl font-bold mr-2">🚄</div>
-          <h1 className="text-2xl font-bold">Railnet</h1>
+          <h2 className="text-xl font-serif font-bold">Railnet</h2>
         </Link>
         <div className="hidden sm:flex space-x-6">
           <Link href="/schedule" className="hover:underline">Schedule</Link>
@@ -363,8 +363,7 @@ export default function RouteTicketsPage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between">
           <div className="mb-6 md:mb-0">
             <div className="flex items-center">
-              <div className="text-2xl mr-2">🚄</div>
-              <h2 className="text-xl font-bold">Railnet</h2>
+              <h2 className="text-xl font-serif font-bold">Railnet</h2>
             </div>
             <p className="mt-2 text-gray-400">Connecting cities, connecting people.</p>
           </div>
